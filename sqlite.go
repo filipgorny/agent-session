@@ -55,7 +55,7 @@ func (s *SQLite) Close() error {
 	return s.db.Close()
 }
 
-func (s *SQLite) Append(sessionID string, m stream.Message) error {
+func (s *SQLite) Append(sessionID string, m stream.Record) error {
 	var payload string
 
 	if m.Payload != nil {
@@ -79,7 +79,7 @@ func (s *SQLite) Append(sessionID string, m stream.Message) error {
 	return nil
 }
 
-func (s *SQLite) List(sessionID string) ([]stream.Message, error) {
+func (s *SQLite) List(sessionID string) ([]stream.Record, error) {
 	rows, err := s.db.Query(
 		`SELECT type, subtype, payload, created_at FROM session_messages WHERE session_id = ? ORDER BY id`,
 		sessionID)
@@ -90,7 +90,7 @@ func (s *SQLite) List(sessionID string) ([]stream.Message, error) {
 
 	defer rows.Close()
 
-	var out []stream.Message
+	var out []stream.Record
 
 	for rows.Next() {
 		var (
@@ -104,7 +104,7 @@ func (s *SQLite) List(sessionID string) ([]stream.Message, error) {
 			return nil, fmt.Errorf("session: scan: %w", err)
 		}
 
-		m := stream.Message{Type: typ, Subtype: subtype.String, CreatedAt: time.Unix(0, created)}
+		m := stream.Record{Type: typ, Subtype: subtype.String, CreatedAt: time.Unix(0, created)}
 
 		if payload.Valid && payload.String != "" {
 			_ = json.Unmarshal([]byte(payload.String), &m.Payload)

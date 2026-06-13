@@ -6,6 +6,6 @@ import "github.com/filipgorny/agent/stream"
 
 // Store persists session messages, keyed by session id.
 type Store interface {
-	Append(sessionID string, m stream.Message) error
-	List(sessionID string) ([]stream.Message, error)
+	Append(sessionID string, m stream.Record) error
+	List(sessionID string) ([]stream.Record, error)
 }

@@ -30,9 +30,9 @@ func TestStores(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			st := build(t)
 
-			_ = st.Append("s1", stream.Message{Type: stream.TypeLog, Subtype: stream.LogToolCall, Payload: map[string]any{"action": "grep"}, CreatedAt: time.Now()})
-			_ = st.Append("s1", stream.Message{Type: stream.TypeAnswerUser, Payload: "hi", CreatedAt: time.Now()})
-			_ = st.Append("s2", stream.Message{Type: stream.TypeSession, CreatedAt: time.Now()})
+			_ = st.Append("s1", stream.Record{Type: stream.TypeLog, Subtype: stream.LogToolCall, Payload: map[string]any{"action": "grep"}, CreatedAt: time.Now()})
+			_ = st.Append("s1", stream.Record{Type: stream.TypeAnswerUser, Payload: "hi", CreatedAt: time.Now()})
+			_ = st.Append("s2", stream.Record{Type: stream.TypeSession, CreatedAt: time.Now()})
 
 			got, err := st.List("s1")
 
@@ -74,7 +74,7 @@ func TestSessionRecordsStart(t *testing.T) {
 
 	select {
 
-	case m := <-s.Messages():
+	case m := <-s.Stream():
 
 		if m.Type != stream.TypeSession || m.Subtype != "START" {
 			t.Fatalf("first message = %s/%s, want SESSION/START", m.Type, m.Subtype)

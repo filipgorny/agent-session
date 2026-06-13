@@ -16,7 +16,7 @@ type Session struct {
 	agent *agent.Agent
 	store Store
 	id    string
-	out   chan stream.Message
+	out   chan stream.Record
 	done  chan struct{}
 	once  sync.Once
 }
@@ -27,11 +27,11 @@ func New(a *agent.Agent, store Store) *Session {
 		agent: a,
 		store: store,
 		id:    newID(),
-		out:   make(chan stream.Message, 256),
+		out:   make(chan stream.Record, 256),
 		done:  make(chan struct{}),
 	}
 
-	s.record(stream.Message{
+	s.record(stream.Record{
 		Type:      stream.TypeSession,
 		Subtype:   "START",
 		Payload:   map[string]any{"id": s.id, "root": a.Root()},
@@ -48,8 +48,8 @@ func (s *Session) ID() string {
 	return s.id
 }
 
-// Messages returns the session's message stream (persisted as it flows).
-func (s *Session) Messages() <-chan stream.Message {
+// Stream returns the session's record stream (persisted as it flows).
+func (s *Session) Stream() <-chan stream.Record {
 	return s.out
 }
 
@@ -68,7 +68,7 @@ func (s *Session) Answer(text string) {
 // Close ends the session.
 func (s *Session) Close() {
 	s.once.Do(func() {
-		s.record(stream.Message{Type: stream.TypeSession, Subtype: "END", CreatedAt: time.Now()})
+		s.record(stream.Record{Type: stream.TypeSession, Subtype: "END", CreatedAt: time.Now()})
 		close(s.done)
 	})
 }
@@ -80,13 +80,13 @@ func (s *Session) pump() {
 		case <-s.done:
 			return
 
-		case m := <-s.agent.Messages():
+		case m := <-s.agent.Stream():
 			s.record(m)
 		}
 	}
 }
 
-func (s *Session) record(m stream.Message) {
+func (s *Session) record(m stream.Record) {
 	_ = s.store.Append(s.id, m)
 
 	select {

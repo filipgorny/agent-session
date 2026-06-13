@@ -3,7 +3,7 @@ module github.com/filipgorny/agent-session
 go 1.26.2
 
 require (
-	github.com/filipgorny/agent v0.0.6
+	github.com/filipgorny/agent v0.0.7
 	modernc.org/sqlite v1.52.0
 )
 

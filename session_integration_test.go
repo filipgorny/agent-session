@@ -64,7 +64,7 @@ loop:
 	for {
 		select {
 
-		case m := <-s.Messages():
+		case m := <-s.Stream():
 			types[m.Type+"/"+m.Subtype] = true
 
 			if m.Type == stream.TypeAnswerUser {

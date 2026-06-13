@@ -9,14 +9,14 @@ import (
 // InMemory is a non-persistent Store (tests / no-save mode).
 type InMemory struct {
 	mu sync.Mutex
-	m  map[string][]stream.Message
+	m  map[string][]stream.Record
 }
 
 func NewInMemory() *InMemory {
-	return &InMemory{m: map[string][]stream.Message{}}
+	return &InMemory{m: map[string][]stream.Record{}}
 }
 
-func (s *InMemory) Append(sessionID string, m stream.Message) error {
+func (s *InMemory) Append(sessionID string, m stream.Record) error {
 	s.mu.Lock()
 
 	defer s.mu.Unlock()
@@ -26,10 +26,10 @@ func (s *InMemory) Append(sessionID string, m stream.Message) error {
 	return nil
 }
 
-func (s *InMemory) List(sessionID string) ([]stream.Message, error) {
+func (s *InMemory) List(sessionID string) ([]stream.Record, error) {
 	s.mu.Lock()
 
 	defer s.mu.Unlock()
 
-	return append([]stream.Message(nil), s.m[sessionID]...), nil
+	return append([]stream.Record(nil), s.m[sessionID]...), nil
 }
